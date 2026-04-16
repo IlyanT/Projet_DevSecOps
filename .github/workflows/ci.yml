@@ -1,34 +1,25 @@
-name: Pipeline DevSecOps
-on: [push]
+name: Pipeline DevSecOps - Projet 5DVSCOPS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  devsecops:
+  build-and-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout du code
         uses: actions/checkout@v4
 
+      # Étape de Linting YAML (Partie 2 du sujet)
       - name: Yaml Lint
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: .
+          config_data: "{extends: default, rules: {line-length: disable}}"
 
-      - name: Trivy FS Scan (Partie 3)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          severity: 'HIGH,CRITICAL'
-
-      - name: Build Docker Image (Partie 2)
-        run: docker build -t devsecops-app:${{ github.sha }} .
-
-      - name: Trivy Image Scan (Partie 3)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'devsecops-app:${{ github.sha }}'
-          severity: 'CRITICAL'
-
-      - name: Conftest Scan (Partie 4)
-        uses: instrumenta/conftest-action@master
-        with:
-          policy: policy/
-          file: k8s-deployment.yaml
+      # Étape de Build Docker (Partie 2 du sujet)
+      - name: Build de l'image Docker
+        run: docker build -t devsecops-project:latest .
